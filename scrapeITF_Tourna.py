@@ -1,0 +1,207 @@
+import requests
+import time
+import os
+import pprint
+import re
+import json
+
+from bs4 import BeautifulSoup
+
+
+
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.chrome.options import Options
+
+
+dir = os.getcwd()
+
+
+options = Options()
+options.add_argument("--headless")
+options.add_argument("--no-proxy-server")
+options.add_argument("--incognito")
+options.add_argument("--proxy-server='direct://'")
+options.add_argument("--proxy-bypass-list=*")
+
+
+
+chromedriver = "~/Downloads/chromedriver"
+os.environ["webdriver.chrome.driver"] = chromedriver
+
+
+driver = webdriver.Chrome(options = options)
+driver.delete_all_cookies()
+
+driver = webdriver.Chrome(options = options)
+
+url= 'https://www.itftennis.com/seniors/tournaments/calendar.aspx?tour=&reg=&nat=&sur=&cate=&age=&iod=&fromDate=01-01-2019&toDate=28-06-2019'
+
+
+driver.get(url)
+html=driver.page_source
+
+
+url_list = list()
+
+
+soup = BeautifulSoup(html,"html.parser")
+
+span = soup.find_all("span",class_="liveScoreTd")
+
+for x in span:
+    a = x.find_all("a")
+
+    for y in a:
+        print(y["href"])
+        url_list.append(y["href"])
+# print(a[0])
+
+
+driver.quit()
+driver = webdriver.Chrome(options = options)
+
+
+url='https://www.itftennis.com/seniors/tournaments/calendar.aspx?tour=&reg=&nat=&sur=&cate=&age=&iod=&fromDate=05-07-2019&toDate=31-12-2019'
+
+
+
+driver.get(url)
+html=driver.page_source
+
+
+
+
+soup = BeautifulSoup(html,"html.parser")
+
+span = soup.find_all("span",class_="liveScoreTd")
+
+for x in span:
+    a = x.find_all("a")
+
+    for y in a:
+        print(y["href"])
+        url_list.append(y["href"])
+
+
+
+F = open("itf_seniors.json","w")
+
+
+
+
+months  = {'January': '01' ,'Feburary':'02','March':'03','April':'04','May':'05','June':'06','July':'07','August':'08','September':'09','October':'10','November':'11','December':'12'}
+def month_to_int(mon):
+    for k in months:
+        if k == mon:
+            mon  = months[k]
+            return mon
+
+key = ['Host nation:','Surface:','Venue:','Category','Website:']
+def key_to_attribute(keys,value):
+    if keys == key[0]:
+        global host
+        host = value
+    elif keys == key[1]:
+        global surface
+        surface = value
+    elif keys == key[2]:
+        global venue
+        venue = value
+    elif keys == key[3]:
+        global categ
+        categ = value
+    elif keys == key[4]:
+        global webs
+        webs = value
+    else:
+        pass
+
+
+
+
+all_tournaments = []
+
+for event in url_list:
+    tournament = {}
+    driver.quit()
+    driver = webdriver.Chrome(options = options)
+
+    url='https://www.itftennis.com{}'.format(event)
+
+    print(url)
+    try:
+        driver.get(url)
+        html=driver.page_source
+
+    except:
+        continue
+
+
+    soup = BeautifulSoup(html,"html.parser")
+
+    key = soup.find("span",class_="h-tkey")
+
+    if True:
+
+        heading = soup.find("h1",id='ltH1Header')
+
+        if heading== None:
+            continue
+
+
+
+        details= soup.find_all("ul")
+        
+        print("Name")   #key
+        tournamentName=" ".join(heading.text.split())#value
+
+        print(tournamentName)
+
+        # F.write("Name : {}\n".format(tournamentName))
+        tournament.update({'Name':'{}'.format(tournamentName)})
+        start = details[14].li
+        while start != None:
+
+
+            key=" ".join(start.span.text.split())
+            value = " ".join(start.span.find_next_sibling().text.split())
+
+            print(key)
+            print(value)
+            # F.write("{} {}\n".format(key,value))
+            tournament.update({'{}'.format(key) :'{}'.format(value)})
+
+            start=start.find_next_sibling()
+
+
+        # F.write("{}".format(value))
+        # F.write("{}".format(key))
+        # F.write("{}".format(url))
+        print("Link")#key
+        print(url)#value
+
+
+        start = details[15].li
+
+        while start != None:
+
+            key=" ".join(start.span.text.split())
+            value = " ".join(start.span.find_next_sibling().text.split())
+
+            print(key)
+            print(value)
+            # F.write("{} {}\n".format(key,value))
+            tournament.update({'{}'.format(key) :'{}'.format(value)})    
+            start=start.find_next_sibling()
+
+        print("Link")#key
+        print(url)#value
+        # F.write("url : {}\n".format(url))
+        tournament.update({'url':'{}'.format(url)})
+        all_tournaments.append(tournament.copy())
+        
+        
+all_tournaments = json.dumps(all_tournaments)
+F.write(all_tournaments)
+F.close()

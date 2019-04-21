@@ -1,0 +1,6 @@
+beautifulsoup4==4.7.1
+bs4==0.0.1
+psycopg2==2.7.7
+selenium==3.141.0
+request==2019.3.22
+requests==2.21.0
