@@ -15,4 +15,4 @@
         2. FSC Tournaments 
         3. Player Ranks
 
-    
+- Run the scraping scripts first then the json to database script.
