@@ -1,8 +1,19 @@
-#### Instructions 
+### ITF SCRAPERS
+#### Setting up chromedriver
+- After cloning this repo
+```
+$ cd itf-scrapers
+$ virtualenv -p python3 venv
+$ source venv/bin/activate
+$ pip install -r requirements.txt
+$ export PATH:$PATH:/present/working/directory/of/this/repo
+$ sudo apt-get install -f
+```
+#### About 
 - This directory includes
     * Scraping scripts of
         1. ITF Tournaments - scrapeITF_Tourna.py
-        2. FSC Tournaments - scrape FSC.py
+        2. FSC Tournaments - scrapeFSC.py
         3. Player Ranks - playerRankscraper.py
 
     * JSON files of 
@@ -17,7 +28,6 @@
 
 - The scraping scripts scrape the respective events and make a repsective json file.
 - The TODB files load the data from the json files to the respective tables in the database.
-- Use the fsc virtual env
 - To load the data change the file permission of load_real_data.sh  
     ```
     $chmod +x load_real_data.sh
