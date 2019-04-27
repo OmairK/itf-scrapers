@@ -5,10 +5,7 @@ import requests
 import re
 import json
 
-import psycopg2
 
-conn = psycopg2.connect(database="mydatabase_phase1", user="postgres",host='127.0.0.1', password="test123",port=5432)
-curr = conn.cursor()
 
 for i in range (75,90):
     url="http://www.fansportsclub.com/Details.aspx?Eid=%d"%(i)
@@ -75,10 +72,10 @@ for i in range (75,90):
             c = json_load['Venue Name']
             d = json_load['Date']
             e = json_load['Description']
-            curr.execute("INSERT INTO tournaments_tournamentfsc(name,age_group,venue,date,description) VALUES (%s, %s,%s,%s, %s)",(a,b,c,d,e))
-            conn.commit()
+            # curr.execute("INSERT INTO tournaments_tournamentfsc(name,age_group,venue,date,description) VALUES (%s, %s,%s,%s, %s)",(a,b,c,d,e))
+            # conn.commit()
 
 # f = open("FSC.json","w")
 # f.write("{}".format(l))
-curr.close()
-conn.close()
+# curr.close()
+# conn.close()
