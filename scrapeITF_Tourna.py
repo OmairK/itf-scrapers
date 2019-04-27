@@ -35,7 +35,7 @@ driver.delete_all_cookies()
 
 driver = webdriver.Chrome(options = options)
 
-url= 'https://www.itftennis.com/seniors/tournaments/calendar.aspx?tour=&reg=&nat=&sur=&cate=&age=&iod=&fromDate=01-01-2019&toDate=28-06-2019'
+url= 'https://www.itftennis.com/seniors/tournaments/calendar.aspx?tour=&reg=&nat=&sur=&cate=&age=&iod=&fromDate=01-01-2019&toDate=08-07-2019'
 
 
 driver.get(url)
@@ -62,7 +62,7 @@ driver.quit()
 driver = webdriver.Chrome(options = options)
 
 
-url='https://www.itftennis.com/seniors/tournaments/calendar.aspx?tour=&reg=&nat=&sur=&cate=&age=&iod=&fromDate=05-07-2019&toDate=31-12-2019'
+url='https://www.itftennis.com/seniors/tournaments/calendar.aspx?tour=&reg=&nat=&sur=&cate=&age=&iod=&fromDate=09-07-2019&toDate=31-12-2019'
 
 
 

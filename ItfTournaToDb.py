@@ -23,11 +23,11 @@ conn.commit()
 for lines in tournament_json:
     lst = [None]*9
     lst[0] = lines['Name']
-    lst[1] = lines['Host nation']
-    a = lines['Date']
+    lst[1] = lines['Host nation:']
+    a = lines['Date:']
     b=a.split(':')
-    print(a)
-    print(b)
+    # print(a)
+    # print(b)
     c=b[0].rstrip('\n')
     startDate,endDate = c.split("-")
     startDateDay,startDateMonth = startDate.split() ### different date formats for use in the flutter app
@@ -35,16 +35,18 @@ for lines in tournament_json:
     STM = month_to_int('{}'.format(startDateMonth))
     ETM = month_to_int('{}'.format(endDateMonth))
     startDateInt = Year + STM + startDateDay
-    endDateInt = Year + ETM + endDateDay    
+    endDateInt = Year + ETM + endDateDay
+    # print(startDateInt)
+    # print(endDateInt)   
     lst[2] = startDateInt
     lst[3] = endDateInt
     lst[4] = lines['Category']
-    lst[6] = lines['Venue']
-    lst[5] = lines['Surface']
+    lst[6] = lines['Venue:']
+    lst[5] = lines['Surface:']
     lst[8] = lines['url']
     
-    if "Website" in lines:
-        lst[7] = lines['Website']
+    if "Website:" in lines:
+        lst[7] = lines['Website:']
     
 
     cur.execute("INSERT INTO tournaments_tournamentitf(tournament_name,host_nation,grade,start_date,end_date,surface,venue,website,link) VALUES (%s, %s,%s,%s, %s,%s,%s, %s,%s)",(lst[0],lst[1],lst[4],lst[2],lst[3],lst[5],lst[6],lst[7],lst[8]))
@@ -55,3 +57,4 @@ cur.fetchone()
 conn.commit()
 cur.close()
 conn.close()
+print("ITF TOURNAMENTS TO DB: CODE 200")
