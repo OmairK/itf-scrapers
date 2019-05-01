@@ -13,11 +13,7 @@ $ sudo apt-get install -f
 - This directory includes
     * Scraping scripts of
         1. ITF Tournaments - scrapeITF_Tourna.py
-<<<<<<< HEAD
         2. FSC Tournaments - scrapeFSC.py
-=======
-        2. FSC Tournaments - scrape FSC.py
->>>>>>> 8ed82e7d64cfdfaf8bbe86ef5a43c07363459403
         3. Player Ranks - playerRankscraper.py
 
     * JSON files of 
@@ -32,12 +28,10 @@ $ sudo apt-get install -f
 
 - The scraping scripts scrape the respective events and make a repsective json file.
 - The TODB files load the data from the json files to the respective tables in the database.
-<<<<<<< HEAD
-=======
-- Use the fsc virtual env
->>>>>>> 8ed82e7d64cfdfaf8bbe86ef5a43c07363459403
 - To load the data change the file permission of load_real_data.sh  
     ```
     $chmod +x load_real_data.sh
     $./load_real_data.sh 
     ```
+#### Setting up Cron Jobs
+- Move all the cron_* files a directory below the itf-scrapers directory
