@@ -39,12 +39,14 @@ driver = webdriver.Chrome(options = options)
 end_date=datetime.datetime.today()+datetime.timedelta(days=180)
 start_date = datetime.datetime.today()-datetime.timedelta(days=30)
 
-end_date= str(end_date.day) + '-'+ str(end_date.month) + '-' + str(end_date.year)
-start_date= str(start_date.day) + '-'+ str(start_date.month) + '-' + str(start_date.year)
+end_date= str(end_date.day) + '-'+ str(end_date.month) + '-' + str(end_date.yea$
+start_date= str(start_date.day) + '-'+ str(start_date.month) + '-' + str(start_$
 
 
 
-url=f"https://www.itftennis.com/seniors/tournaments/calendar.aspx?tour=&reg=&nat=&sur=&cate=&age=&iod=&fromDate=${start_date}&toDate={end_date}"
+url='https://www.itftennis.com/seniors/tournaments/calendar.aspx?tour=&reg=&nat=&sur=&cate=&age=&iod=&fromDate={start_date}09-07-2019&toDate=31-12-2019'
+
+
 
 driver.get(url)
 html=driver.page_source
@@ -55,8 +57,6 @@ html=driver.page_source
 soup = BeautifulSoup(html,"html.parser")
 
 span = soup.find_all("span",class_="liveScoreTd")
-
-url_list = []
 
 for x in span:
     a = x.find_all("a")
