@@ -1,21 +1,21 @@
-import requests
 import time
 import os
-import pprint
-import re
 import json
+import requests
+import re
 import datetime
+import pprint
+import pandas as pd
+
 from bs4 import BeautifulSoup
-
-
-
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
-
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 dir = os.getcwd()
-
 
 options = Options()
 options.add_argument("--headless")
@@ -25,165 +25,108 @@ options.add_argument("--proxy-server='direct://'")
 options.add_argument("--proxy-bypass-list=*")
 
 
-
-chromedriver = "~/Downloads/chromedriver"
+chromedriver = "/home/omair/Downloads"
 os.environ["webdriver.chrome.driver"] = chromedriver
 
 
-driver = webdriver.Chrome(options = options)
+driver = webdriver.Chrome(options=options)
 driver.delete_all_cookies()
 
-driver = webdriver.Chrome(options = options)
+driver = webdriver.Chrome(options=options)
 
 
-end_date=datetime.datetime.today()+datetime.timedelta(days=180)
-start_date = datetime.datetime.today()-datetime.timedelta(days=30)
+"""
+Proceure:
+    1) Generate urls for 12 coming months
+    2) Scrape the data from each urls
+    3) Maintain a pandas dataframe of all tournaments
+    4) Convert it into a json format
+"""
 
-end_date= str(end_date.day) + '-'+ str(end_date.month) + '-' + str(end_date.year)
-start_date= str(start_date.day) + '-'+ str(start_date.month) + '-' + str(start_date.year)
-
-
-
-url=f"https://www.itftennis.com/seniors/tournaments/calendar.aspx?tour=&reg=&nat=&sur=&cate=&age=&iod=&fromDate=${start_date}&toDate={end_date}"
-
-driver.get(url)
-html=driver.page_source
-
-
-
-
-soup = BeautifulSoup(html,"html.parser")
-
-span = soup.find_all("span",class_="liveScoreTd")
 
 url_list = []
 
-for x in span:
-    a = x.find_all("a")
 
-    for y in a:
-        print(y["href"])
-        url_list.append(y["href"])
-
-
-
-F = open("itf_seniors.json","w")
-
-
+def generate_urls():
+    """
+    Appends genrated urls to the urls list
+    """
+    start_date = datetime.datetime.today()
+    for i in range(12):
+        start_date += datetime.timedelta(days=31)
+        url = f"https://www.itftennis.com/en/tournament-calendar/seniors-tennis-tour-calendar/?startdate={start_date.year}-{start_date.month}"
+        url_list.append(url)
 
 
-months  = {'January': '01' ,'Feburary':'02','March':'03','April':'04','May':'05','June':'06','July':'07','August':'08','September':'09','October':'10','November':'11','December':'12'}
-def month_to_int(mon):
-    for k in months:
-        if k == mon:
-            mon  = months[k]
-            return mon
-
-key = ['Host nation:','Surface:','Venue:','Category','Website:']
-def key_to_attribute(keys,value):
-    if keys == key[0]:
-        global host
-        host = value
-    elif keys == key[1]:
-        global surface
-        surface = value
-    elif keys == key[2]:
-        global venue
-        venue = value
-    elif keys == key[3]:
-        global categ
-        categ = value
-    elif keys == key[4]:
-        global webs
-        webs = value
-    else:
-        pass
+tournaments_list = []
 
 
+def text_scraper(page_html, url):
+    """
+    Scrapes the html from the page returned by the driver
+    """
+
+    tr = page_html.find_all('tr', class_="whatson-table__tournament")
+    for i in range(len(tr)):
+        tournament = {'Name': None, 'Host nation:': None, 'Date:': None, 'Surface': None,
+                      'Venue': None, 'Category': None, 'Website:': None, 'url': None}
+        tournament['Name'] = tr[i].find('td', class_='name').get_text('div')
+        tournament['Date:'] = tr[i].find('td', class_='date').find(
+            'span', class_='date').get_text()
+        tournament['Host nation:'] = tr[i].find('td', class_='hostname').find(
+            'span', class_='hostname').get_text()
+        tournament['Venue'] = tr[i].find('td', class_='location').find(
+            'span', class_='location').get_text()
+        tournament['Category'] = tr[i].find('td', class_='category').find(
+            'span', class_='category').get_text()
+        tournament['Surface'] = tr[i].find('td', class_='surface').find(
+            'span', class_='surface').get_text()
+        if tr[i].find('td', class_='name').find('a').has_attr('href'):
+            tournament['url'] = "https://www.itftennis.com" + tr[i].find(
+                'td', class_='name').find('a').attrs['href']
+        tournament['Website:'] = url
+        tournaments_list.append(tournament.copy())
 
 
-all_tournaments = []
+def show_more():
+    """
+    Clicks on the show more button to display all the 
+    """
+    delay = 4
+    elements_left = True
+    while(elements_left):
+        try:
+            driver.find_element_by_xpath(
+                '/html/body/main/div[2]/div[2]/section/div/div/button').click()
+        except NoSuchElementException as e:
+            elements_left = False
+            # print("All the tournaments are visible now")
 
-for event in url_list:
-    tournament = {}
-    driver.quit()
-    driver = webdriver.Chrome(options = options)
 
-    url='https://www.itftennis.com{}'.format(event)
+def json_writer():
+    """
+    Writes the json of all tournaments to a file
+    """
+    global tournaments_list
+    if(len(tournaments_list) != 0):
+        tournaments_list = json.dumps(tournaments_list)
+        with open('itf_seniors.json', 'w') as file:
+            file.write(tournaments_list)
+            print('File written')
 
-    print(url)
-    try:
+
+def driver_code():
+    """
+    Executes the procedure 
+    """
+    generate_urls()
+    for url in url_list:
         driver.get(url)
-        html=driver.page_source
-
-    except:
-        continue
-
-
-    soup = BeautifulSoup(html,"html.parser")
-
-    key = soup.find("span",class_="h-tkey")
-
-    if True:
-
-        heading = soup.find("h1",id='ltH1Header')
-
-        if heading== None:
-            continue
+        show_more()
+        html = BeautifulSoup(driver.page_source, 'html.parser')
+        text_scraper(html, url)
+    json_writer()
 
 
-
-        details= soup.find_all("ul")
-        
-        print("Name")   #key
-        tournamentName=" ".join(heading.text.split())#value
-
-        print(tournamentName)
-
-        # F.write("Name : {}\n".format(tournamentName))
-        tournament.update({'Name':'{}'.format(tournamentName)})
-        start = details[14].li
-        while start != None:
-
-
-            key=" ".join(start.span.text.split())
-            value = " ".join(start.span.find_next_sibling().text.split())
-
-            print(key)
-            print(value)
-            # F.write("{} {}\n".format(key,value))
-            tournament.update({'{}'.format(key) :'{}'.format(value)})
-
-            start=start.find_next_sibling()
-
-
-        # F.write("{}".format(value))
-        # F.write("{}".format(key))
-        # F.write("{}".format(url))
-        print("Link")#key
-        print(url)#value
-
-
-        start = details[15].li
-
-        while start != None:
-
-            key=" ".join(start.span.text.split())
-            value = " ".join(start.span.find_next_sibling().text.split())
-
-            print(key)
-            print(value)
-            # F.write("{} {}\n".format(key,value))
-            tournament.update({'{}'.format(key) :'{}'.format(value)})    
-            start=start.find_next_sibling()
-
-        print("Link")#key
-        print(url)#value
-        # F.write("url : {}\n".format(url))
-        tournament.update({'url':'{}'.format(url)})
-        all_tournaments.append(tournament.copy())
-        
-        
-all_tournaments = json.dumps(all_tournaments)
-F.write(all_tournaments)
-F.close()
+if __name__ == '__main__':
+    driver_code()
