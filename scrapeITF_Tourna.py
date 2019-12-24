@@ -68,18 +68,18 @@ def text_scraper(page_html, url):
 
     tr = page_html.find_all('tr', class_="whatson-table__tournament")
     for i in range(len(tr)):
-        tournament = {'Name': None, 'Host nation:': None, 'Date:': None, 'Surface': None,
-                      'Venue': None, 'Category': None, 'Website:': None, 'url': None}
+        tournament = {'Name': None, 'Host nation:': None, 'Date:': None, 'Surface:': None,
+                      'Venue:': None, 'Category': None, 'Website:': None, 'url': None}
         tournament['Name'] = tr[i].find('td', class_='name').get_text('div')
         tournament['Date:'] = tr[i].find('td', class_='date').find(
             'span', class_='date').get_text()
         tournament['Host nation:'] = tr[i].find('td', class_='hostname').find(
             'span', class_='hostname').get_text()
-        tournament['Venue'] = tr[i].find('td', class_='location').find(
+        tournament['Venue:'] = tr[i].find('td', class_='location').find(
             'span', class_='location').get_text()
         tournament['Category'] = tr[i].find('td', class_='category').find(
             'span', class_='category').get_text()
-        tournament['Surface'] = tr[i].find('td', class_='surface').find(
+        tournament['Surface:'] = tr[i].find('td', class_='surface').find(
             'span', class_='surface').get_text()
         if tr[i].find('td', class_='name').find('a').has_attr('href'):
             tournament['url'] = "https://www.itftennis.com" + tr[i].find(

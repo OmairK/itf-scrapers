@@ -29,14 +29,15 @@ for lines in tournament_json:
     # print(a)
     # print(b)
     c=b[0].rstrip('\n')
-    startDate,endDate = c.split("-")
+    startDate,endDate = c.split("to")
     startDateDay,startDateMonth = startDate.split() ### different date formats for use in the flutter app
     endDateDay,endDateMonth,Year = endDate.split()
     STM = month_to_int('{}'.format(startDateMonth))
     ETM = month_to_int('{}'.format(endDateMonth))
     startDateInt = Year + STM + startDateDay
     endDateInt = Year + ETM + endDateDay
-    # print(startDateInt)
+    
+    print(startDateInt)
     # print(endDateInt)   
     lst[2] = startDateInt
     lst[3] = endDateInt
