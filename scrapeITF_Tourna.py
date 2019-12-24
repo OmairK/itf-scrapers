@@ -5,7 +5,7 @@ import requests
 import re
 import datetime
 import pprint
-import pandas as pd
+
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
