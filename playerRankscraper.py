@@ -1,64 +1,76 @@
+import time
+import random
+import requests
+import os
+import json
 from bs4 import BeautifulSoup
+
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
-import json
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
-
-F = open("PlayerRanks.json" , "w")
-
-options = Options()
+options = FirefoxOptions()
 options.add_argument("--headless")
-options.add_argument("--no-proxy-server")
-options.add_argument("--incognito")
-options.add_argument("--proxy-server='direct://'")
-options.add_argument("--proxy-bypass-list=*")
-
-driver = webdriver.Chrome(options = options)
-driver.delete_all_cookies()
-driver.implicitly_wait(10)
-wait =WebDriverWait(driver,10)
+driver = webdriver.Firefox(options=options)
 
 
-keyP  = {1: 'Rank' ,2:'Player',3:'Movement',4:'Nation',5:'DOB',6:'Events',7:'Points',8:'AgeGroup'}
-def keyint_to_Key(numb):
-    for k in keyP:
-        if k == numb:
-            numb  = keyP[k]
-            return numb
+"""
+Procedure
+    1) Generate URls for all age groups
+"""
 
-ageGroups = [35,40,45,50,55,60,65,70,75,80] ## Age Groups in Rankings
-RankingType = ['S','D'] ##Singles or Doubles
-AllPlayers = []
+itf_to_local_dict = {'rank': 'Rank', 'playerfamilyname': 'Player', 'rankmovement': 'Movement',
+                     'birthYear': 'DOB', 'tournamentsplayed': 'Events', 'points': 'Points', 'Age Group': 'Age Group',
+                     'Type': 'Type'}
 
-for types in RankingType:
-  for ages in ageGroups:
-    driver.quit()
-    driver = webdriver.Chrome(options = options)
+local_player_list = []
 
-    url = 'https://www.itftennis.com/seniors/rankings/rankings-list/players.aspx?Gender=M&AgeGroup=V{}&Nation=IND&From=0&To=-1&Name=&Type={}'.format(ages,types) 
-    def scrape(url):
-      driver.get(url)
-      html = driver.page_source
-      driver.quit()
-      soup = BeautifulSoup(html,"html.parser")
-      counter = 0
-      tr = soup.find_all('td')
-      player = {}
-      for data in tr:
-        if data.text == '\n':
-            if counter != 0:
-              player.update({'Type' : '{}'.format(types)})
-              player.update({'Age Group' : '{}'.format(ages)})
-              AllPlayers.append(player.copy())
-            counter = 0
-        else:
-          counter = counter + 1
-          key = keyint_to_Key(counter)
-          value = data.text.strip()
-          player.update({'{}'.format(key) : '{}'.format(value)})
+def get_urls():
+    """
+    Generate urls for the url list
+    """
 
-    scrape(url)
-AllPlayers = json.dumps(AllPlayers)
-F.write(AllPlayers)
+    categories = ['S', 'D']
+    for category in categories:
+        for age in range(35, 71, 5):
+            randoms = random.randrange(51, 99)
+            url = f"https://www.itftennis.com/Umbraco/Api/PlayerRankApi/GetPlayerRankings?circuitCode=VT&playerTypeCode=M&matchTypeCode=S&ageCategoryCode=V35&nationCode=IND%20%20%20%20%20&take={randoms}&skip=0"
+            driver.get(url)
+            xml_scraper(age, category, driver.page_source)
 
+
+def xml_scraper(age, category, xml_txt):
+
+    large_list = []
+    xml_txt = BeautifulSoup(xml_txt, 'lxml')
+
+    players = xml_txt.find_all('playerrankingapimodel')
+    print(players)
+    for player in players:
+        loc_player = {'Rank': None, 'Player': None, 'Movement': None, 'Nation': 'IND',
+                      'DOB': None, 'Events': None, 'Points': None, 'Age Group': age, 'Type': category}
+
+        loc_player['Rank'] = player.find('rank').text
+        loc_player['DOB'] = player.find('birthyear').text
+        loc_player['Player'] = player.find('playerfamilyname').text
+        loc_player['Movement'] = player.find('rankmovement').text
+        loc_player['Events'] = player.find('tournamentsplayed').text
+        loc_player['Points'] = player.find('points').text
+        local_player_list.append(loc_player)
+        print(json.dumps(local_player_list))
+        
+
+
+def driver_code():
+    get_urls()
+    
+    with open('PlayerRanks.json','w') as file:
+        file.write(json.dumps(local_player_list))
+
+
+
+    
+
+driver_code()
