@@ -26,8 +26,7 @@ def get_urls():
             randoms = random.randrange(70, 99)
             url = f"https://www.itftennis.com/Umbraco/Api/PlayerRankApi/GetPlayerRankings?circuitCode=VT&playerTypeCode=M&matchTypeCode=S&ageCategoryCode=V{age}&nationCode=IND%20%20%20%20%20&take={randoms}&skip=0"
             driver.get(url)
-            all_players.append(xml_scraper(
-                age, category, driver.page_source))
+            all_players += xml_scraper(age, category, driver.page_source)
     return all_players
 
 
@@ -35,12 +34,12 @@ def xml_scraper(age, category, xml_txt):
     """
     Scrapes the details of each player from xml data and puts it in a list
     """
-    players_w_same_category = []
-    xml_txt = BeautifulSoup(xml_txt, 'lxml')
-    players = xml_txt.find_all('playerrankingapimodel')
+    players_w_same_category=[]
+    xml_txt=BeautifulSoup(xml_txt, 'lxml')
+    players=xml_txt.find_all('playerrankingapimodel')
 
     for player in players:
-        loc_player = {'Rank': None, 'Player': None, 'Movement': None, 'Nation': 'IND',
+        loc_player={'Rank': None, 'Player': None, 'Movement': None, 'Nation': 'IND',
                       'DOB': None, 'Events': None, 'Points': None, 'Age Group': age, 'Type': category}
 
         loc_player['Rank'] = player.find('rank').text
