@@ -44,7 +44,7 @@ def xml_scraper(age, category, xml_txt):
 
         loc_player['Rank'] = player.find('rank').text
         loc_player['DOB'] = player.find('birthyear').text
-        loc_player['Player'] = player.find('playerfamilyname').text
+        loc_player['Player'] = player.find('playergivenname').text +" "+ player.find('playerfamilyname').text[0] + player.find('playerfamilyname').text[1:].lower()
         loc_player['Movement'] = player.find('rankmovement').text
         loc_player['Events'] = player.find('tournamentsplayed').text
         loc_player['Points'] = player.find('points').text
