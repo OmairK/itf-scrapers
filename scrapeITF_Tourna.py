@@ -76,7 +76,7 @@ def text_scraper(page_html, url):
         tournament['Host nation:'] = tr[i].find('td', class_='hostname').find(
             'span', class_='hostname').get_text()
         tournament['Venue:'] = tr[i].find('td', class_='location').find(
-            'span', class_='location').get_text()
+            'span', class_='location').get_text() + " , " + tournament['Host nation:']
         tournament['Category'] = tr[i].find('td', class_='category').find(
             'span', class_='category').get_text()
         tournament['Surface:'] = tr[i].find('td', class_='surface').find(
