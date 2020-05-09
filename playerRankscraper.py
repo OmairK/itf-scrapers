@@ -3,6 +3,7 @@ import random
 import requests
 import os
 import json
+import pdb
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -24,7 +25,7 @@ def get_urls():
     for category in categories:
         for age in range(35, 85, 5):
             randoms = random.randrange(70, 99)
-            url = f"https://www.itftennis.com/Umbraco/Api/PlayerRankApi/GetPlayerRankings?circuitCode=VT&playerTypeCode=M&matchTypeCode=S&ageCategoryCode=V{age}&nationCode=IND%20%20%20%20%20&take={randoms}&skip=0"
+            url = f"https://www.itftennis.com/Umbraco/Api/PlayerRankApi/GetPlayerRankings?circuitCode=VT&playerTypeCode=M&matchTypeCode=S&ageCategoryCode=V{age}&nationCode=IND&seniorRankingType=ITF&take={randoms}&skip=0"
             driver.get(url)
             all_players += xml_scraper(age, category, driver.page_source)
     return all_players
@@ -36,18 +37,18 @@ def xml_scraper(age, category, xml_txt):
     """
     players_w_same_category=[]
     xml_txt=BeautifulSoup(xml_txt, 'lxml')
-    players=xml_txt.find_all('playerrankingapimodel')
-
+    players=xml_txt.find_all('d2p1:playerrankingapimodel')
+    # pdb.set_trace()
     for player in players:
         loc_player={'Rank': None, 'Player': None, 'Movement': None, 'Nation': 'IND',
                       'DOB': None, 'Events': None, 'Points': None, 'Age Group': age, 'Type': category}
 
-        loc_player['Rank'] = player.find('rank').text
-        loc_player['DOB'] = player.find('birthyear').text
-        loc_player['Player'] = player.find('playergivenname').text +" "+ player.find('playerfamilyname').text[0] + player.find('playerfamilyname').text[1:].lower()
-        loc_player['Movement'] = player.find('rankmovement').text
-        loc_player['Events'] = player.find('tournamentsplayed').text
-        loc_player['Points'] = player.find('points').text
+        loc_player['Rank'] = player.find('d2p1:rank').text
+        loc_player['DOB'] = player.find('d2p1:birthyear').text
+        loc_player['Player'] = player.find('d2p1:playergivenname').text +" "+ player.find('d2p1:playerfamilyname').text[0] + player.find('d2p1:playerfamilyname').text[1:].lower()
+        loc_player['Movement'] = player.find('d2p1:rankmovement').text
+        loc_player['Events'] = player.find('d2p1:tournamentsplayed').text
+        loc_player['Points'] = player.find('d2p1:points').text
 
         players_w_same_category.append(loc_player)
 
