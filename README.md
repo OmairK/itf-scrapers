@@ -1,4 +1,5 @@
 ### ITF SCRAPERS
+Scraper to scrape tournament info from the ITF website.
 #### Setting up chromedriver
 - After cloning this repo
 ```
