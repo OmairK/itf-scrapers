@@ -25,11 +25,9 @@ if(tournament_json != None):
         lst = [None]*9
         if(len(lines['Name'])>=15):
             lst[0] = lines['Name']
-            lst[1] = lines['Host nation:']
-            a = lines['Date:']
+            lst[1] = lines['Host nation']
+            a = lines['Date']
             b=a.split(':')
-            # print(a)
-            # print(b)
             c=b[0].rstrip('\n')
             startDate,endDate = c.split("to")
             startDateDay,startDateMonth = startDate.split() ### different date formats for use in the flutter app
@@ -44,12 +42,12 @@ if(tournament_json != None):
             lst[2] = startDateInt
             lst[3] = endDateInt
             lst[4] = lines['Category']
-            lst[6] = lines['Venue:']
-            lst[5] = lines['Surface:']
+            lst[6] = lines['Venue']
+            lst[5] = lines['Surface']
             lst[8] = lines['url']
     
             if "Website:" in lines:
-                lst[7] = lines['Website:']
+                lst[7] = lines['Website']
     
     
             cur.execute("INSERT INTO tournaments_tournamentitf(tournament_name,host_nation,grade,start_date,end_date,surface,venue,website,link) VALUES (%s, %s,%s,%s, %s,%s,%s, %s,%s)",(lst[0],lst[1],lst[4],lst[2],lst[3],lst[5],lst[6],lst[7],lst[8]))

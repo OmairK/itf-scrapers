@@ -24,16 +24,11 @@ options.add_argument("--incognito")
 options.add_argument("--proxy-server='direct://'")
 options.add_argument("--proxy-bypass-list=*")
 
-
-chromedriver = "/home/omair/Downloads"
-os.environ["webdriver.chrome.driver"] = chromedriver
-
-
 driver = webdriver.Chrome(options=options)
 driver.delete_all_cookies()
 
 driver = webdriver.Chrome(options=options)
-
+driver.implicitly_wait(3)
 
 """
 Proceure:
@@ -52,7 +47,7 @@ def generate_urls():
     Appends genrated urls to the urls list
     """
     start_date = datetime.datetime.today()
-    for i in range(12):
+    for _ in range(12):
         start_date += datetime.timedelta(days=31)
         url = f"https://www.itftennis.com/en/tournament-calendar/seniors-tennis-tour-calendar/?startdate={start_date.year}-{start_date.month}"
         url_list.append(url)
@@ -68,39 +63,37 @@ def text_scraper(page_html, url):
 
     tr = page_html.find_all('tr', class_="whatson-table__tournament")
     for i in range(len(tr)):
-        tournament = {'Name': None, 'Host nation:': None, 'Date:': None, 'Surface:': None,
-                      'Venue:': None, 'Category': None, 'Website:': None, 'url': None}
+        tournament = {'Name': None, 'Host nation': None, 'Date': None, 'Surface': None,
+                      'Venue': None, 'Category': None, 'Website': None, 'url': None}
         tournament['Name'] = tr[i].find('td', class_='name').get_text('div')
-        tournament['Date:'] = tr[i].find('td', class_='date').find(
+        tournament['Date'] = tr[i].find('td', class_='date').find(
             'span', class_='date').get_text()
-        tournament['Host nation:'] = tr[i].find('td', class_='hostname').find(
+        tournament['Host nation'] = tr[i].find('td', class_='hostname').find(
             'span', class_='hostname').get_text()
-        tournament['Venue:'] = tr[i].find('td', class_='location').find(
-            'span', class_='location').get_text() + "," + tournament['Host nation:']
+        tournament['Venue'] = tr[i].find('td', class_='location').find(
+            'span', class_='location').get_text() + "," + tournament['Host nation']
         tournament['Category'] = tr[i].find('td', class_='category').find(
             'span', class_='category').get_text()
-        tournament['Surface:'] = tr[i].find('td', class_='surface').find(
+        tournament['Surface'] = tr[i].find('td', class_='surface').find(
             'span', class_='surface').get_text()
         if tr[i].find('td', class_='name').find('a').has_attr('href'):
             tournament['url'] = "https://www.itftennis.com" + tr[i].find(
                 'td', class_='name').find('a').attrs['href']
-        tournament['Website:'] = url
+        tournament['Website'] = url
         tournaments_list.append(tournament.copy())
-
 
 def show_more():
     """
     Clicks on the show more button to display all the 
     """
-    delay = 4
     elements_left = True
     while(elements_left):
         try:
             driver.find_element_by_xpath(
                 '/html/body/main/div[2]/div[2]/section/div/div/button').click()
-        except NoSuchElementException as e:
+            print("button_click")
+        except NoSuchElementException:
             elements_left = False
-            # print("All the tournaments are visible now")
 
 
 def json_writer():

@@ -25,7 +25,6 @@ djangorestframework==3.9.1
 djangorestframework-jwt==1.11.0
 djangorestframework-oauth==1.1.0
 fcm-django==0.2.21
-get==2019.3.22
 httpie==1.0.2
 idna==2.8
 isort==4.3.20
@@ -40,8 +39,6 @@ numpy==1.18.0
 oauthlib==3.0.1
 pandas==0.25.3
 Pillow==6.0.0
-post==2019.3.22
-pprint==0.1
 psycopg2==2.7.7
 public==2019.3.22
 pycodestyle==2.5.0
@@ -55,7 +52,6 @@ python3-openid==3.1.0
 pytz==2018.9
 query-string==2019.3.22
 razorpay==1.1.1
-request==2019.3.22
 requests==2.21.0
 requests-oauthlib==1.2.0
 requests-toolbelt==0.9.1
